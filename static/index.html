@@ -1,0 +1,68 @@
+<meta charset="UTF-8" />
+<title>リアルタイム字幕生成</title>
+<head>
+  <meta charset="utf-8">
+  <title>リアルタイム字幕生成</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="container">
+    <div id="transcription-container"></div>
+    <div id="additional-info-container"></div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.13.1/dist/ort.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad/dist/index.browser.js"></script>
+<script type="module">
+  const transcriptionContainer = document.getElementById('transcription-container');
+  const translationContainer = document.getElementById('additional-info-container');
+
+  try {
+    const minSpeechSec = 5; // 最低{minSpeechSec}秒溜まるまで録音を続ける
+    const samplingRate = 16000;
+    let arr_cum = new Float32Array();
+    const myvad = await vad.MicVAD.new({
+      positiveSpeechThreshold: 0.8,
+      negativeSpeechThreshold: 0.8 - 0.15,
+      minSpeechFrames: 1,
+      preSpeechPadFrames: 1,
+      redemptionFrames: 2,
+      onSpeechEnd: async (arr) => {
+        arr_cum = new Float32Array([...arr_cum, ...arr])
+        if (arr_cum.length < minSpeechSec * samplingRate) return;
+        const wavBuffer = vad.utils.encodeWAV(arr_cum)
+        arr_cum = new Float32Array();
+        var file = new File([wavBuffer], `file${Date.now()}.wav`)
+        let formData = new FormData()
+        formData.append("file", file)
+        try {
+          const resp = await fetch("/api/transcribe", {
+            method: "POST",
+            body: formData,
+          })
+          const resp2 = await resp.json()
+          console.log(resp2.text)
+          const result_text = resp2.text;
+          const transcriptionElement = document.createElement('div');
+          transcriptionElement.innerText = result_text;
+          transcriptionContainer.appendChild(transcriptionElement);
+          transcriptionContainer.scrollIntoView(false)
+
+          console.log(resp2.translation)
+          if (resp2.translation != null) {
+            const translationElement = document.createElement('div');
+            translationElement.innerText = resp2.translation;
+            translationContainer.appendChild(translationElement);
+            translationContainer.scrollIntoView(false)
+          }
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    })
+    myvad.start()
+    console.log("vad started")
+ } catch (e) {
+   console.error("Failed:", e)
+ }
+</script>

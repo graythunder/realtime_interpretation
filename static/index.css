@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@900&display=swap');
+
+body {
+  background-color: beige;
+ }
+ .container {
+   display: flex;
+ }
+ #transcription-container, #additional-info-container {
+   flex: 1;
+   padding: 10px;
+   box-sizing: border-box;
+ }
+ 
+ #transcription-container {
+   border-right: 1px solid black;
+ }
+ 
+ #additional-info-container {
+   margin-left: 20px; 
+ }
