@@ -15,3 +15,4 @@ python3 whisper_server.py
 2. ブラウザでlocalhost:9999(デフォルト)を開く
 3. スピーカー等から音声を流すと音声認識結果(左)と翻訳結果(右)が表示される
 - 注意: このアプリケーションと同じブラウザで音声を再生するとうまく音を拾えない場合があるので,別のブラウザで再生すると良さそう
+<img width="1336" alt="スクリーンショット 2023-12-28 13 39 42" src="https://github.com/graythunder/realtime_interpretation/assets/28726854/031d0424-6897-4e00-9638-87267e2db9b3">
